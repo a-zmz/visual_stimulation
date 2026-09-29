@@ -35,6 +35,7 @@ function showStimuli(par)
         AssertOpenGL;
         dummy=GetSecs;
         Screen('Preference', 'VisualDebugLevel', 1); % to avoid the white welcome screen
+        Screen('Preference', 'SkipSyncTests', 1);
         [white, black, grey] = CustomStimulus.getColors(par.screenNumber);
         Screen('Preference', 'Verbosity', 1); % 1 = only display PTB critical errors (use 2 to also display warnings)
         Screen('Preference', 'VBLTimestampingMode', -1); % avoid error message about timestamp accuracy with multi-screen displays. high precison timestamping does not work under these conditions.
