@@ -1,8 +1,8 @@
 = README
 
-This visual stimulation method was originally developed by by Tom Mayo in 2013,
-then edited and Lukas Solanka, Paolo Puggioni, Zahid Pademsay, and Tom
-Flossmann.
+This visual stimulation method was originally developed by Tom Mayo in 2013,
+then edited and improved by Lukas Solanka, Paolo Puggioni, Zahid Pademsay, and
+Tom Flossmann.
 Currently maintained by Mengzhen Arthur Zhang.
 
 == requirement
