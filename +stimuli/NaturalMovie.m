@@ -40,7 +40,9 @@ loopTimes = nan(timesLoop, 1);
 % -------------------------------------------------------------------------
 stimTimes(1) = GetSecs(); % trial start
 WaitSecs(blackTime);
+% gray
 Screen('FillRect', hWindow, 150, screenSize);
+write(par.arduinoObj, '1', "char");
 stimTimes(2) = Screen('Flip', hWindow);
 
 WaitSecs(greyTime);
