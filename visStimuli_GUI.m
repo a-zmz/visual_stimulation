@@ -73,9 +73,9 @@ set(handles.tempFreq,'String','1.0');
 % retinotopy
 
 % Parameters section
-set(handles.distScreen,'String','25');
-set(handles.widthScreen,'String','52');
-set(handles.numberScreen,'String','0');
+set(handles.distScreen,'String','21'); %'25'
+set(handles.widthScreen,'String','53'); %'52'
+set(handles.numberScreen,'String','2');
 %set(handles.sizeImage,'String','800');
 set(handles.stdevGauss,'String','10');
 set(handles.trimGauss,'String','0.05');
