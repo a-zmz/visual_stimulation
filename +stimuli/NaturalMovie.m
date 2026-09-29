@@ -161,8 +161,7 @@ loopTimes = loopTimes-stimTimes(1);
 stimTimes = stimTimes-stimTimes(1);
 
 % output data
-data_all.time = [stimTimes(1:3); loopTimes; stimTimes(4:end-1)];
-
+data_all.time = [stimTimes(1:3); loopTimes; stimTimes(4:end)];
 [stimType{1:timesLoop,1}] = deal('M'); % M for Movie
 
 %data_all.type = ['U'; 'U'; stimType; 'U'; 'U'];
@@ -172,6 +171,7 @@ data_all.type = [{'TrialStart'}; ...
                  stimType; ...
                  {'MovieEndSync'}; ...
                  {'PostMovieGray'}; ...
-                 {'PostMovieBlack'}];
+                 {'PostMovieBlack'}; ...
+                 {'TrialEnd'};];
 
 end
