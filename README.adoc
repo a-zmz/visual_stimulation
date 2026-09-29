@@ -1,7 +1,9 @@
 = README
 
-this visual stimulation method was originally developed by zahid pademsay, now
-improved and maintained by arthur.
+This visual stimulation method was originally developed by by Tom Mayo in 2013,
+then edited and Lukas Solanka, Paolo Puggioni, Zahid Pademsay, and Tom
+Flossmann.
+Currently maintained by Mengzhen Arthur Zhang.
 
 == requirement
 . matlab 2022 or later
@@ -11,13 +13,11 @@ improved and maintained by arthur.
 == tips
 what if psychtoolbox cannot find your gstreamer::
 . set gstreamer environment variable inside matlab by
-`setenv('GSTREAMER_1_0_ROOT_MSVC_X86_64', 'C:\Program
-Files\gstreamer\1.0\msvc_x86_64\')` then `setenv('PATH', ['C:\Program
-Files\gstreamer\1.0\msvc_x86_64\bin;' getenv('PATH')])`
+`setenv('GSTREAMER_1_0_ROOT_MSVC_X86_64', 'path\to\gstreamer\')` then
+`setenv('PATH', ['path\to\gstreamer\bin;' getenv('PATH')])`
 
 . set environment variable permanently in windows:
     . search and open `edit the system environment variables`
     . click `environment variables`
     . add new under `User variables`
-    . then edit Path and add 'C:\Program Files\gstreamer\1.0\msvc_x86_64\' to
-    the system path too
+    . then edit Path and add 'path\to\gstreamer\' to the system path too
