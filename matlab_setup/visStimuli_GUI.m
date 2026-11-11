@@ -1053,93 +1053,84 @@ function runCustom_Callback(hObject, eventdata, handles)
     par = getParam(handles); 
 
     % >>> Zahid Edit >>>
-    if strfind(par.customSeq,'explore') > 0
-        par.customSeq = '0,30,60,90,120,150,180,0,30,60,90,120,150,180,0,30,60,90,120,150,180,0,30,60,90,120,150,180,0,30,60,90,120,150,180,0,30,60,90,120,150,180,0,30,60,90,120,150,180';
+    % Expand the exploration sequence
+    if ~isempty(strfind(par.customSeq, 'explore'))
+        orientations = repmat(0:30:180, 1, 7);
+
+        par.customSeq = sprintf('%g,', orientations);
+        par.customSeq(end) = [];  % Remove trailing comma.
     end
-      
-    if strfind(par.customSeq,'test') > 0
-        if strfind(par.customSeq,'2') > 0
+
+    % Generate a randomised test sequence
+    if ~isempty(strfind(par.customSeq, 'test'))
+
+        if ~isempty(strfind(par.customSeq, '2'))
             rep = 2;
         else
             rep = 1;
         end
 
-        if strfind(par.customSeq,'sp') > 0
-            % try  
-            global spatial_freqstim 
-            
-            if length(spatial_freqstim)== 0
-                % spatial_freqstim = [0.01,0.02,0.04,0.08,0.16,0.32];
+        % Cycle through spatial frequencies in randomized order
+        if ~isempty(strfind(par.customSeq, 'sp'))
+            global spatial_freqstim
+
+            if isempty(spatial_freqstim)
                 spatial_freqstim = [0.04, 0.16];
-                spatial_freqstim = datasample(
-                    spatial_freqstim,
-                    length(spatial_freqstim),
-                    'Replace',
-                    false,
-                )
+                % spatial_freqstim = [0.01, 0.02, 0.04, 0.08, 0.16, 0.32];
+                spatial_freqstim = ...
+                    spatial_freqstim(randperm(numel(spatial_freqstim)));
             end
-            
-            % catch
-            %     disp('error');
-            %     global spatial_freqstim;
-            %     spatial_freqstim = [0.01,0.02,0.04,0.08,0.16,0.32];
-            % end    
-            % r = randi([1 length(spatial_freqstim)],1,1);
+
             par.spatFreq = spatial_freqstim(1);
             spatial_freqstim(1) = [];
-
         end
-              
+
+        % Twelve orientations: 0, 30, ..., 330 degrees.
         par.numorient = 12;
-        orientationstim = (0:360/par.numorient:360-360/par.numorient);
-        scarmbled_orientationstim = datasample(
-            orientationstim,
-            par.numorient,
-            'Replace',
-            false,
-        );    
+        orientationstim = (0:par.numorient-1) * (360 / par.numorient);
 
-        par.customSeq = 'b,g,';
-        for index = [1:par.numorient]
-            par.customSeq = [
-                par.customSeq,
-                num2str(scarmbled_orientationstim(index)),
-                ',g,'
-            ];   
-        end
+        par.customSeq = '';
 
-        par.customSeq = [par.customSeq,'b'];
-        
-        if rep == 2
-            scarmbled_orientationstim = datasample(
-                orientationstim,
-                par.numorient,
-                'Replace',
-                false,
-            );     
-            par.customSeq = [par.customSeq,',b,b,g,'];
-            for index = [1:par.numorient]
-                par.customSeq = [
-                    par.customSeq,
-                    num2str(scarmbled_orientationstim(index)),
-                    ',g,',
-                ];   
+        for repetition = 1:rep
+            scrambled_orientationstim = ...
+                orientationstim(randperm(par.numorient));
+
+            if repetition == 1
+                par.customSeq = 'b,g,';
+            else
+                % Preserve the original inter-repetition structure.
+                par.customSeq = [par.customSeq, ',b,b,g,'];
             end
-            par.customSeq = [par.customSeq,'b'];
+
+            for index = 1:par.numorient
+                par.customSeq = [par.customSeq, ...
+                    num2str(scrambled_orientationstim(index)), ',g,'];
+            end
+
+            par.customSeq = [par.customSeq, 'b'];
         end
-        
     end
 
     try
-        type = determineGratingType(par);     
-        par.stimulusDrawers = stimuli.parseCustomSequence(par.customSeq, type);
+        gratingType = determineGratingType(par);
+
+        par.stimulusDrawers = ...
+            stimuli.parseCustomSequence(par.customSeq, gratingType);
+
         par.Custom_seq = 1;
         showStimuli(par);
-     catch e
-         if strcmp(e.identifier, 'stimuli:parseCustomSequence:InvalidValue')
-             title = 'An error occurred when parsing the custom sequence string';
-             uiwait(errordlg(e.message, title, 'modal'))
-         else
-             rethrow(e);
-         end
-     end
+
+    catch e
+        if strcmp(e.identifier, ...
+                'stimuli:parseCustomSequence:InvalidValue')
+
+            dialogTitle = ...
+                'An error occurred when parsing the custom sequence string';
+
+            uiwait(errordlg(e.message, dialogTitle, 'modal'));
+        else
+            rethrow(e);
+        end
+    end
+    % <<< Zahid Edit <<<
+end
