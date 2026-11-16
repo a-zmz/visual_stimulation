@@ -6,21 +6,45 @@ import pandas as pd
 
 from common_utils import file_utils
 
-def construct_meta(mice):
-    from common_utils.generic_meta import datastore
+def get_exp(mouse_ids):
+    from pixels import Experiment
+    from pixels.behaviours.no_behaviour import NoBehaviour
 
-    # >>> read relevant files >>> 
-    data_path = file_utils.make_path(datastore + "data/behaviour/visual_stim/")
-    basic_info_path = data_path / "cache/basic_info.h5"
+    from analysis.base import (data_dir, interim_dir, processed_dir,
+                               session_date_fmt)
+    from analysis.project.food_restricted.fr_base import exclude_date
 
-    if basic_info_path.exsits():
-        basic_info = file_utils.read_hdf5(basic_info_path)
+    exp = Experiment(
+        mouse_ids=mouse_ids,
+        behaviour=NoBehaviour,
+        data_dir=data_dir,
+        interim_dir=interim_dir, # interim directory
+        processed_dir=processed_dir, # processed directory
+        interim1_dir=None,
+        interim2_dir=None,
+        session_date_fmt=session_date_fmt,
+        of_date=None,
+        exclude_date=exclude_date,
+    )
+
+    return exp
+
+
+def _read_basic_info(mice, data_path, basic_info_path, keys):
+    from visual_stim.base import FoodWeight
+
+    if basic_info_path.exists():
+        info = {}
+        for key in keys:
+            info[key] = file_utils.read_hdf5(basic_info_path, key=key)
+        return info
+
     else:
         excel_name = "food_restriction_track.xlsx"
         # load info from excel
         info = pd.read_excel(
             io=data_path/excel_name,
-            sheet_name=["bodyweight", "food_weight", "stage"],
+            sheet_name=keys,
             header=0,
             index_col=0,
         )
@@ -52,44 +76,64 @@ def construct_meta(mice):
             )
             # make sure column is object
             df.columns = df.columns.set_levels([
-                pd.Index(level.to_numpy(dtype=object), dtype=object)
+                pd.Index(level.to_numpy(dtype=str), dtype=str)
                 for level in df.columns.levels
             ])
-
-        # get total implant weight
-        implant_weight = pd.Series(file_utils.load_yaml(
-            data_path/"food_restriction_implant_weights.yaml"
-        )).sum()
-
-        # remove implant weight from bodyweigth
-        bw = info["bodyweight"] - implant_weight
-        info["bodyweight"] = bw
 
         file_utils.write_hdf5(
             path=basic_info_path,
             df=info,
-            format="fixed", # skip compression but keep multiindex
+            format="fixed", # hdf layout
         )
 
-    # <<< read relevant files <<< 
+    return info
 
-    assert 0
-    # TODO nov 13 2026
-    # CONTINUE HERE!!
 
-    # get stage info
-    stage = info["stage"]
-
-    items = ["mouse_id", "date", "bodyweight", "bodyweight/baseline",
+def _construct_meta(mice, raw_path, info):
+    meta_items = ["mouse_id", "date", "bodyweight", "bodyweight/baseline",
              "food_weight", "fr_stage", "condition", "notes"]
-    for mouse_id in mice:
-        vals = []
-        vals.append(mouse_id)
+
+    meta = pd.DataFrame(
+        data=np.full(len(meta_items), np.nan),
+        index=meta_items,
+    )
+    meta.columns = ["value"]
+    meta.index.name = "item"
+
+    for mouse in mice:
+        exp = get_exp(mouse)
+        for session in exp.sessions:
+            meta["mouse_id"] = mouse
+            meta["date"] = session.date
+            meta["bodyweight"] = (
+                info["bodyweight"]
+                .loc[session.date, pd.IndexSlice[:, mouse]]
+            )
+            assert 0
+
+        raw_path / mouse_id
 
         # TODO nov 13 2026
         # get baseline bodyweight from txt, and bodyweight from excel
 
         assert 0
-    pd.DataFrame
+
+    return None
+
+
+def construct_meta(mice):
+    from common_utils.generic_meta import datastore
+
+    data_path = file_utils.make_path(datastore + "data/behaviour/visual_stim/")
+    basic_info_path = data_path / "cache/basic_info.h5"
+    info_keys = ["bodyweight", "baseline_ration", "food_weight_gain",
+                 "food_weight", "stage"]
+
+    # >>> read relevant files >>> 
+    info = _read_basic_info(mice, data_path, basic_info_path, info_keys)
+    # <<< read relevant files <<< 
+
+    raw_path = data_path.parent.parent / "npx/raw/"
+    _construct_meta(mice, raw_path, info)
 
     return None
