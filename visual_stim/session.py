@@ -56,7 +56,7 @@ class Session(BaseMeta):
         )
 
 
-    def extract_trials(self):
+    def concat_raw_data(self):
 
         """
         Write getting trial data as a separate function to deal with .mat file

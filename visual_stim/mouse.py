@@ -230,9 +230,7 @@ class Mouse:
                     continue
 
                 # clean up data
-                clean_data = session.clean_raw_data(session.data)
-                # correct false licks
-                session.data = session.correct_false_licks(clean_data)
+                clean_data = session.concat_raw_data()
 
                 sessions[ses_stage.name.lower()].append(session)
 
