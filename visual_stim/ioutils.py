@@ -54,6 +54,15 @@ def _read_basic_info(mice, data_path, basic_info_path, keys):
             data_path/"food_restriction_group.yaml"
         )
 
+        # get total implant weight
+        implant_weight = pd.Series(file_utils.load_yaml(
+            data_path/"food_restriction_implant_weights.yaml"
+        )).sum()
+
+        # remove implant weight from bodyweigth
+        bw = info["bodyweight"] - implant_weight
+        info["bodyweight"] = bw
+
         # Map mouse ID -> group
         mouse_to_group = {
             mouse: group_name
@@ -61,11 +70,22 @@ def _read_basic_info(mice, data_path, basic_info_path, keys):
             for mouse in mice
         }
 
+        # convert food weight values to float
+        info["food_weight"] = (
+            info["food_weight"]
+            .replace({
+                "x": FoodWeight.FOOD_REMOVED,
+                "ad libitum": FoodWeight.AD_LIBITUM,
+            })
+            .apply(pd.to_numeric, errors="raise")
+            .astype("float64")
+        )
+
         for key, df in info.items():
             # convert index to object
             df.index = pd.Index(
-                df.index.to_numpy("object"),
-                dtype=object,
+                df.index.to_numpy("str"),
+                dtype=str,
                 name="date",
             )
 

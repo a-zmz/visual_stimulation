@@ -198,3 +198,7 @@ class Stages(IntEnum):
 
         raise ValueError(f"Unsupported concrete session stage: {value}")
 
+
+class FoodWeight:
+    AD_LIBITUM = 99
+    FOOD_REMOVED = 0
