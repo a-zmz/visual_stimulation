@@ -198,7 +198,7 @@ class Mouse:
         # initiate Session class from files
         if len(session_dates) > 0:
             for n, name in enumerate(session_dates):
-                session = Session.get_vr_session(
+                session = Session.get_session(
                     mouse_dir=mouse_dir,
                     name=name,
                     cache_dir=cache_dir,
@@ -212,12 +212,9 @@ class Mouse:
 
                 raw_stage = session.meta_item("fr_stage")
                 if raw_stage == MISSING_VALUE:
-                    ses_stage = Levels.NONE
+                    ses_stage = Stages.NONE
                 else:
-                    ses_stage = Levels.parse_session_stage(raw_stage)
-
-                assert 0
-                # TODO nov 13 2026 continue here
+                    ses_stage = Stages.parse_session_stage(raw_stage)
 
                 if not include_stage is None:
                     # only include sessions from certain training stage 
