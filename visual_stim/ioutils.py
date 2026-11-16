@@ -97,12 +97,21 @@ def _read_basic_info(mice, path, basic_info_path, keys, group_map):
     return info
 
 
-def _construct_meta(mice, raw_path, info):
-    meta_items = ["mouse_id", "date", "bodyweight", "bodyweight/baseline",
-             "food_weight", "fr_stage", "condition", "notes"]
+def _construct_meta(mice, behaviour_path, info, group_map):
+    from visual_stim.base import FoodWeight
+
+    # get baseline bodyweight
+    baselines = pd.read_csv(
+        behaviour_path.parent / "az_baseline_weights.txt",
+        sep="\t",
+        index_col=0,
+    )
+
+    meta_items = ["mouse_id", "condition", "date", "bodyweight",
+                  "bodyweight/baseline", "food_weight", "fr_stage", "notes"]
 
     meta = pd.DataFrame(
-        data=np.full(len(meta_items), np.nan),
+        data=np.full(len(meta_items), np.nan, dtype=str),
         index=meta_items,
     )
     meta.columns = ["value"]
@@ -111,20 +120,37 @@ def _construct_meta(mice, raw_path, info):
     for mouse in mice:
         exp = get_exp(mouse)
         for session in exp.sessions:
-            meta["mouse_id"] = mouse
-            meta["date"] = session.date
-            meta["bodyweight"] = (
-                info["bodyweight"]
-                .loc[session.date, pd.IndexSlice[:, mouse]]
+            meta_path = session.raw / (session.raw.name + "_meta.txt")
+            if meta_path.exists():
+                continue
+
+            ses_idx = (session.date, pd.IndexSlice[:, mouse])
+
+            meta.loc["mouse_id"] = mouse
+
+            meta.loc["condition"] = group_map[mouse]
+
+            meta.loc["date"] = session.date
+
+            meta.loc["bodyweight"] = str(round(
+                info["bodyweight"].loc[ses_idx].item(),
+                3,
+            ))
+
+            meta.loc["bodyweight/baseline"] = str(round(
+                float(meta.loc["bodyweight"].item())
+                / baselines.loc[mouse].item(),
+                3,
+            ))
+
+            meta.loc["food_weight"] = FoodWeight.to_str(
+                info["food_weight"].loc[ses_idx].item()
             )
-            assert 0
 
-        raw_path / mouse_id
+            meta.loc["fr_stage"] = info["stage"].loc[ses_idx].item()
 
-        # TODO nov 13 2026
-        # get baseline bodyweight from txt, and bodyweight from excel
-
-        assert 0
+            # save to raw
+            meta.to_csv(meta_path, sep="\t")
 
     return None
 
