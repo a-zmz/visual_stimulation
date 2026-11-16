@@ -104,6 +104,27 @@ class Mouse:
                     dests=[backup_mouse/date, interim_mouse/date],
                 )
 
+                # also copy metadata
+                matches = sorted(
+                    (raw / data_dir).parent.parent.glob(f"*{name}*meta.txt")
+                )
+
+                if not matches:
+                    raise FileNotFoundError(
+                        "\n> No metadata matching found in "
+                        f"{(raw / data_dir).parent.parent}"
+                    )
+
+                if len(matches) > 1:
+                    raise ValueError(
+                        f"Multiple metadata matches for session {name!r}: {matches}"
+                    )
+
+                file_utils.copy_files(
+                    source=matches[0],
+                    dests=[backup_mouse/date, interim_mouse/date],
+                )
+
         return interim_mouse
 
 
