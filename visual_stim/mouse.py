@@ -224,7 +224,7 @@ class Mouse:
                     at_stage = True
 
                 # exclude sessions with no data
-                if len(session.data) == 0 or not at_stage:
+                if len(os.listdir(session.data_dir)) == 0 or not at_stage:
                     removal.append(name)
                     #logging.warning(f"\n> Excluded session {name}.")
                     continue
