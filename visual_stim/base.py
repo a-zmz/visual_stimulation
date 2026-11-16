@@ -146,6 +146,20 @@ class Stages(IntEnum):
         raise ValueError(f"Unsupported concrete session stage: {value}")
 
 
-class FoodWeight:
+class FoodWeight(IntEnum):
     AD_LIBITUM = 99
     FOOD_REMOVED = 0
+
+    @classmethod
+    def to_str(cls, value):
+        try:
+            return cls(value).name.lower()
+        except ValueError:
+            return str(value)
+
+    @classmethod
+    def from_str(cls, value):
+        try:
+            return cls.__members__[value.strip().upper()].value
+        except ValueError:
+            return value
