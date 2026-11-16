@@ -16,7 +16,7 @@ class Session(BaseMeta):
 
 
     @classmethod
-    def get_vr_session(cls, mouse_dir=None, name=None, cache_dir=None):
+    def get_session(cls, mouse_dir=None, name=None, cache_dir=None):
         """
         Initialise a Session object from behavioural data file.
 
@@ -35,11 +35,12 @@ class Session(BaseMeta):
                 f"Mouse directory does not exist or is not a directory: {mouse_dir}"
             )
 
-        matches = sorted(mouse_dir.glob(f"*{name}_meta*"))
+        ses_dir = mouse_dir / name
+        matches = sorted(ses_dir.glob(f"*{name}*meta*"))
 
         if not matches:
             raise FileNotFoundError(
-                f"No metadata matching '*{name}_meta*' found in {mouse_dir}"
+                f"No metadata matching '*{name}*meta*' found in {ses_dir}"
             )
 
         if len(matches) > 1:
@@ -49,7 +50,7 @@ class Session(BaseMeta):
 
         return cls(
             name=name,
-            data_dir=data_dir,
+            data_dir=ses_dir,
             meta_dir=matches[0],
             cache_dir=cache_dir,
         )
