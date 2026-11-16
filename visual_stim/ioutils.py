@@ -30,7 +30,7 @@ def get_exp(mouse_ids):
     return exp
 
 
-def _read_basic_info(mice, data_path, basic_info_path, keys):
+def _read_basic_info(mice, path, basic_info_path, keys, group_map):
     from visual_stim.base import FoodWeight
 
     if basic_info_path.exists():
@@ -43,32 +43,20 @@ def _read_basic_info(mice, data_path, basic_info_path, keys):
         excel_name = "food_restriction_track.xlsx"
         # load info from excel
         info = pd.read_excel(
-            io=data_path/excel_name,
+            io=path/excel_name,
             sheet_name=keys,
             header=0,
             index_col=0,
         )
 
-        # get group info
-        group = file_utils.load_yaml(
-            data_path/"food_restriction_group.yaml"
-        )
-
         # get total implant weight
         implant_weight = pd.Series(file_utils.load_yaml(
-            data_path/"food_restriction_implant_weights.yaml"
+            path/"food_restriction_implant_weights.yaml"
         )).sum()
 
         # remove implant weight from bodyweigth
         bw = info["bodyweight"] - implant_weight
         info["bodyweight"] = bw
-
-        # Map mouse ID -> group
-        mouse_to_group = {
-            mouse: group_name
-            for group_name, mice in group.items()
-            for mouse in mice
-        }
 
         # convert food weight values to float
         info["food_weight"] = (
@@ -91,7 +79,7 @@ def _read_basic_info(mice, data_path, basic_info_path, keys):
 
             # columns become (group, mouse_id)
             df.columns = pd.MultiIndex.from_tuples(
-                [(mouse_to_group.get(mouse), mouse) for mouse in df.columns],
+                [(group_map.get(mouse), mouse) for mouse in df.columns],
                 names=["group", "mouse_id"]
             )
             # make sure column is object
@@ -144,16 +132,33 @@ def _construct_meta(mice, raw_path, info):
 def construct_meta(mice):
     from common_utils.generic_meta import datastore
 
-    data_path = file_utils.make_path(datastore + "data/behaviour/visual_stim/")
-    basic_info_path = data_path / "cache/basic_info.h5"
+    behaviour_path = file_utils.make_path(
+        datastore + "data/behaviour/visual_stim/"
+    )
+    basic_info_path = behaviour_path / "cache/basic_info.h5"
     info_keys = ["bodyweight", "baseline_ration", "food_weight_gain",
                  "food_weight", "stage"]
 
+    # get group info
+    group = file_utils.load_yaml(
+        behaviour_path / "food_restriction_group.yaml"
+    )
+
+    # map mouse ID -> group
+    group_map = {
+        mouse: group_name
+        for group_name, mice in group.items()
+        for mouse in mice
+    }
+
     # >>> read relevant files >>> 
-    info = _read_basic_info(mice, data_path, basic_info_path, info_keys)
+    info = _read_basic_info(mice, behaviour_path, basic_info_path, info_keys,
+                            group_map)
     # <<< read relevant files <<< 
 
-    raw_path = data_path.parent.parent / "npx/raw/"
-    _construct_meta(mice, raw_path, info)
+    pixels_path = behaviour_path.parent.parent / "npx/raw/"
+    _construct_meta(mice, behaviour_path, info, group_map)
+
+    print(f"> Metadata constructed for sessions from {mice}.")
 
     return None
