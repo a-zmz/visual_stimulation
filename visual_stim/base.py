@@ -15,24 +15,15 @@ class BaseMeta:
     Base class represents meta from a single session.
     """
 
-    def __init__(self, meta_dir, name=None):
+    def __init__(self, meta_path, name=None):
         self.name = name
 
-        if isinstance(meta_dir, (str, Path)):
-            self.meta = self.get_meta(meta_dir)
-            self.meta_dir = meta_dir
+        if isinstance(meta_path, (str, Path)):
+            self.meta = self.get_meta(meta_path)
+            self.meta_path = meta_path
         else:
-            self.meta = meta_dir
-            self.meta_dir = None
-
-        # TODO nov 11 2026 for session meta we want:
-        # date, mouse id, bodyweight, food weight, stage, trial_types
-
-        # TODO nov 11 2026 bodyweight and food intake need to be fetched from
-        # excel
-
-        # TODO nov 11 2026 we need to concatenate data from all trials, and get
-        # their meta too
+            self.meta = meta_path
+            self.meta_path = None
 
         # date
         self.date = self.meta_item("date")
@@ -63,10 +54,10 @@ class BaseMeta:
 
 
     @staticmethod
-    def get_meta(meta_dir):
+    def get_meta(meta_path):
         # read meta file
         df = pd.read_csv(
-            meta_dir,
+            meta_path,
             sep="\t+",
             engine="python",
             header=None,

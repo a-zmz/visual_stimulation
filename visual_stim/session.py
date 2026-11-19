@@ -13,14 +13,16 @@ class Session(BaseMeta):
     Represents a single session, mainly its behavioural data.
     """
 
-    def __init__(self, name=None, data_dir=None, meta_dir=None, cache_dir=None):
-        super().__init__(meta_dir, name=name)
+    def __init__(self, date=None, data_dir=None, meta_path=None, cache_dir=None):
+        super().__init__(meta_path, name=date)
         self.cache_dir = cache_dir
         self.data_dir = data_dir
+        self.meta_path = meta_path
+        self.mouse_id = meta_path.name.split("_")[-2]
 
 
     @classmethod
-    def get_session(cls, mouse_dir=None, name=None, cache_dir=None):
+    def get_session(cls, mouse_dir=None, date=None, cache_dir=None):
         """
         Initialise a Session object from behavioural data file.
 
