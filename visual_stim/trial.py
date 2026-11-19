@@ -19,12 +19,11 @@ from visual_stim.base import (StimulusType, Retinotopy, Movie, ScreenStatus,
 from visual_stim.configs import *
 from visual_stim.constants import *
 
-
-class Trial(BaseMeta):
-    def __init__(self, meta_dir, data=None, name=None, condition=None):
-        super().__init__(meta_dir, name)
-        self.data = data
-        self.condition = condition
+class Trial():
+    def __init__(self, session_meta, session_date, data_path):
+        self.data_path = data_path
+        # make it clear the meta is session meta, not trial meta 
+        self.session_meta = session_meta
 
 
     @classmethod
