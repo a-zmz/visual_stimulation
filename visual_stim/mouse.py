@@ -223,6 +223,9 @@ class Mouse:
                     # if include_stage is None then we include all stages
                     at_stage = True
 
+                # get trial paths
+                session.trial_paths = sorted(session.data_dir.glob("*.mat"))
+
                 # exclude sessions with no data
                 if len(session.trial_paths) == 0 or not at_stage:
                     removal.append(date)
