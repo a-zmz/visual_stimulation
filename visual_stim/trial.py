@@ -12,20 +12,13 @@ from __future__ import annotations
 import pickle
 
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 
-from pixels import PixelsError
-#from pixels.behaviours import Behaviour
+from visual_stim.base import (StimulusType, Retinotopy, Movie, ScreenStatus,
+                              GratingWaveStyle)
+from visual_stim.configs import *
+from visual_stim.constants import *
 
-#from common_utils import file_utils
-from vision_in_darkness.base import (Conditions, Worlds, Visibilities, Outcomes,
-                                     BaseMeta)
-from vision_in_darkness.configs import *
-from vision_in_darkness.metrics import lick_error
-from vision_in_darkness.simulation.simulation_configs import *
-
-MISSING_VALUE = 9999
 
 class Trial(BaseMeta):
     def __init__(self, meta_dir, data=None, name=None, condition=None):

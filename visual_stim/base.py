@@ -4,7 +4,7 @@ Objects that represents metadata from a session.
 import re
 from pathlib import Path
 
-from enum import IntFlag, auto, IntEnum, Enum
+from enum import IntEnum, auto, unique
 
 import pandas as pd
 

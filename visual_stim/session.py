@@ -1,9 +1,13 @@
 from pathlib import Path
 
+import pandas as pd
+import numpy as np
+
+from common_utils import file_utils
+
 from visual_stim.base import BaseMeta
-
-MISSING_VALUE = 9999
-
+from visual_stim.configs import *
+from visual_stim.trial import Trial
 class Session(BaseMeta):
     """
     Represents a single session, mainly its behavioural data.
