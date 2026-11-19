@@ -30,7 +30,7 @@ class BaseMeta:
         # bodyweight (g)
         self.bodyweight = float(self.meta_item("bodyweight"))
         # bodyweight / baseline weight ratio (%)
-        self.bodyweight = float(self.meta_item("bodyweight/baseline")) * 100
+        self.bw_ratio = float(self.meta_item("bodyweight/baseline")) * 100
 
         # food restriction condition group
         self.condition = self.meta_item("condition")
