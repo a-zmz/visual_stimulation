@@ -159,11 +159,11 @@ class Mouse:
         # cache dir
         cache_dir = interim + "behaviour/cache/visual_stim/"
 
-        from visual_stim.base import Stages
+        from visual_stim.base import Stage
         if include_stage is not None:
-            stages = Stages.from_values(include_stage)
+            stages = Stage.from_values(include_stage)
         else:
-            stages = list(Stages)
+            stages = list(Stage)
 
         stage_names = [stage.name.lower() for stage in stages]
 
@@ -212,9 +212,9 @@ class Mouse:
 
                 raw_stage = session.meta_item("fr_stage")
                 if raw_stage == MISSING_VALUE:
-                    ses_stage = Stages.NONE
+                    ses_stage = Stage.NONE
                 else:
-                    ses_stage = Stages.parse_session_stage(raw_stage)
+                    ses_stage = Stage.parse_session_stage(raw_stage)
 
                 if not include_stage is None:
                     # only include sessions from certain training stage 
