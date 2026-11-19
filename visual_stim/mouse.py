@@ -197,17 +197,17 @@ class Mouse:
         removal = []
         # initiate Session class from files
         if len(session_dates) > 0:
-            for n, name in enumerate(session_dates):
+            for n, date in enumerate(session_dates):
                 session = Session.get_session(
                     mouse_dir=mouse_dir,
-                    name=name,
+                    date=date,
                     cache_dir=cache_dir,
                 )
 
                 if no_dates:
-                    if any([date in name for date in no_dates]):
+                    if any([d in date for date in no_dates]):
                         # exclude if not met
-                        removal.append(name)
+                        removal.append(date)
                         continue
 
                 raw_stage = session.meta_item("fr_stage")
@@ -231,7 +231,7 @@ class Mouse:
                 # clean up data
                 clean_data = session.concat_raw_data()
 
-                sessions[ses_stage.name.lower()].append(session)
+                sessions[ses_stage.date.lower()].append(session)
 
             # remove excluded sessions from names
             session_names = list(
