@@ -31,8 +31,8 @@ class Session(BaseMeta):
         mouse_dir: str, directory to behavioural training data of a session
         from a experimental mouse.
         """
-        if mouse_dir is None or name is None:
-            raise ValueError("mouse_dir and name must be provided.")
+        if mouse_dir is None or date is None:
+            raise ValueError("mouse_dir and date must be provided.")
 
         mouse_dir = Path(mouse_dir)
 
@@ -41,29 +41,28 @@ class Session(BaseMeta):
                 f"Mouse directory does not exist or is not a directory: {mouse_dir}"
             )
 
-        ses_dir = mouse_dir / name
-        matches = sorted(ses_dir.glob(f"*{name}*meta*"))
+        ses_dir = mouse_dir / date
+        matches = sorted(ses_dir.glob(f"*{date}*meta*"))
 
         if not matches:
             raise FileNotFoundError(
-                f"No metadata matching '*{name}*meta*' found in {ses_dir}"
+                f"No metadata matching '*{date}*meta*' found in {ses_dir}"
             )
 
         if len(matches) > 1:
             raise ValueError(
-                f"Multiple metadata matches for session {name!r}: {matches}"
+                f"Multiple metadata matches for session {date!r}: {matches}"
             )
 
         return cls(
-            name=name,
+            date=date,
             data_dir=ses_dir,
-            meta_dir=matches[0],
+            meta_path=matches[0],
             cache_dir=cache_dir,
         )
 
 
     def concat_raw_data(self):
-
         """
         Write getting trial data as a separate function to deal with .mat file
         so that the same code can be reused.
