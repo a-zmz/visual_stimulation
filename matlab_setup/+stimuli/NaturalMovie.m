@@ -46,49 +46,6 @@ write(par.arduinoObj, '1', "char");
 stimTimes(2) = Screen('Flip', hWindow);
 WaitSecs(greyTime);
 
-% % -------------------------------------------------------------------------
-% % Movie start sync pulse, after gray and before movie starts
-% % -------------------------------------------------------------------------
-% if isfield(par, 'arduinoObj')
-%     write(par.arduinoObj, '1', "char");
-%     stimTimes(3) = GetSecs();
-% else
-%     warning('No arduino object found in par. Sync pulse not sent.');
-%     stimTimes(3) = NaN;
-% end
-
-% % -------------------------------------------------------------------------
-% % Movie playback
-% % -------------------------------------------------------------------------
-% % loop through movie as many times as will fit fully into total stim duration (does not play partial movies)
-% for iLoop = 1:timesLoop;
-%     Screen('PlayMovie', hMovie, playRate, loop, soundVolume);% Start playback engine
-%     
-%     % Playback loop: Runs until end of movie
-%     t = 0;
-%     t1 = GetSecs();
-%     loopTimes(iLoop) = GetSecs(); % get start of loop period
-%     
-%     while t <= par.movieDur % play all frames
-%         % Wait for next movie frame, retrieve texture handle to it
-%         tex = Screen('GetMovieImage', hWindow, hMovie);
-% %         % Valid texture returned? A negative value means end of movie reached:
-% %         if tex<=0
-% %             sca
-% %             
-% %             % We're done, break out of loop:
-% %             break;
-% %         end
-%         Screen('DrawTexture', hWindow, tex, [], screenSize);  % Draw the new texture immediately to screen
-%         t = Screen('Flip', hWindow); % Update display
-%         t = t-t1;
-%         
-%         Screen('Close', tex); % Release texture
-%     end
-%     
-%     Screen('PlayMovie', hMovie, 0); % Stop playback
-% end
-
 % -------------------------------------------------------------------------
 % Movie playback with sync at first frame
 % -------------------------------------------------------------------------
