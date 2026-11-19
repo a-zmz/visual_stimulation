@@ -8,6 +8,7 @@ from common_utils import file_utils
 from visual_stim.base import BaseMeta
 from visual_stim.configs import *
 from visual_stim.trial import Trial
+
 class Session(BaseMeta):
     """
     Represents a single session, mainly its behavioural data.
@@ -71,5 +72,68 @@ class Session(BaseMeta):
         ===
         output: 
         """
-        # TODO nov 11 continue here
+        # get directories
+        data_path = self.cache_dir\
+                    + f"trials/{self.mouse_id}_{self.date}_trials.h5"
+        meta_path = self.cache_dir\
+                    + f"trials/{self.mouse_id}_{self.date}_trial_meta.h5"
+
+        try:
+            data = file_utils.read_hdf5(data_path)
+            meta = file_utils.read_hdf5(meta_path)
+            logging.info(
+                f"\n> Concatenated trials of {self.mouse_id} "
+                f"{self.date} is loaded."
+            )
+
+        except FileNotFoundError:
+            logging.warning(
+                f"\n> Concatenated trials not found for {self.mouse_id}, "
+                   f"{self.date} extract now.")
+
+            data, meta = self._concat_raw_data()
+            file_utils.write_hdf5(data_path, data)
+            file_utils.write_hdf5(meta_path, meta)
+
+        except (KeyError, ValueError, OSError) as e:
+            logging.error(f"\nError loading HDF5 file: {e}")
+            raise
+
+        return data, meta
+
+
+    def _concat_raw_data(self):
+        from visual_stim.base import StimulusType
+        stim_types = [mem.name.lower() for mem in list(StimulusType)]
+
+        data = dict(zip(stim_types, [[], [], [], []]))
+        meta = {}
+        for t, trial_path in enumerate(self.trial_paths):
+            # initiate trial object
+            trial = Trial.get_trial(
+                session_meta=self.meta,
+                session_date=self.date,
+                data_path=trial_path,
+            )
+            trial_data, trial_meta = trial.extract_data(t)
+
+            data[trial.stim_type].append(trial_data)
+            meta[t] = trial_meta
+
+        # concat data and remove empty
+        data = {
+            key: pd.concat(frames, axis=0)
+            for key, frames in data.items()
+            if len(frames) > 0
+        }
+
+        # concat meta
+        meta_df = (
+            pd.DataFrame(meta)
+            .rename_axis(index="attribute", columns="trial_id")
+        ).T
+        # recover numeric types where possible
+        meta_df = meta_df.infer_objects()
+
+        return data, meta_df
 
