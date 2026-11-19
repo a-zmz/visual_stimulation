@@ -157,7 +157,7 @@ class Mouse:
         no_dates: list, list of dates to exclude.
         """
         # cache dir
-        cache_dir = interim + "behaviour_cache/visual_stim"
+        cache_dir = interim + "behaviour/cache/visual_stim/"
 
         from visual_stim.base import Stages
         if include_stage is not None:
