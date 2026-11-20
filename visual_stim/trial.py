@@ -135,8 +135,9 @@ class Trial():
             "TrialStart": ScreenStatus.BLACK,
             "PreMovieGray": ScreenStatus.GREY,
             "PostMovieGray": ScreenStatus.GREY,
-            "PostMovieBlack": ScreenStatus.BLACK,
-            "E": ScreenStatus.END,
+            "PostMovieBlack": ScreenStatus.BLACK, # post movie black start
+            "TrialEnd": ScreenStatus.END, # post movie black end
+            "E": ScreenStatus.END, # drawing finished
         }
 
         status = []
