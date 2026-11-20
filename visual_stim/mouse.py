@@ -279,12 +279,13 @@ class Mouse:
         Get trials from training sessions of a mouse.
 
         """
-        trials = {}
+        data = {}
+        meta = {}
 
         for day, session in enumerate(self.sessions):
-            trials[session.name] = session.get_trials()
+            data[session.name], meta[session.name] = session.get_trials()
 
-        return trials
+        return data, meta
 
 
     def sync_streams(self, SAMPLE_RATE, sync_idx, ref_idx):
