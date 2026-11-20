@@ -231,41 +231,28 @@ class Mouse:
                     removal.append(date)
                     continue
 
-                # clean up data
-                clean_data = session.concat_raw_data()
+                # concatenate raw trial data
+                session.concat_raw_data()
 
-                sessions[ses_stage.date.lower()].append(session)
+                sessions[ses_stage.name.lower()].append(session)
 
-            # remove excluded sessions from names
-            session_names = list(
-                filter(lambda x: x not in removal, session_names)
+            # remove excluded sessions from date
+            session_dates = list(
+                filter(lambda x: x not in removal, session_dates)
             )
 
-            # get collapsed stages map
-            collapse_map = Levels.collapse_name_map(stages)
-            # group sessions by main stage if all stages from the main stage
-            # were included
-            grouped_sessions = {}
-            for stage, ls in sessions.items():
-                key = collapse_map.get(stage, stage)
-                # use current stage if not all stages included
-                grouped_sessions.setdefault(key, []).extend(ls)
+            # remove empty
+            output_sessions = [v[0] for _, v in sessions.items() if v]
+            # update included stage names
+            stage_names = [ses.fr_stage for ses in output_sessions]
 
-            output_sessions = []
-            no_empty = {
-                k: v for k, v in grouped_sessions.items() if v
-            }
-            for stage in no_empty:
-                # sort sessions by date
-                no_empty[stage].sort(key=lambda s: s.name)
-
-            # sort sessions by name
-            output_sessions.sort(key=lambda s: s.name)
+            # sort sessions by date
+            output_sessions.sort(key=lambda s: s.date)
 
             mouse = cls(mouse_id=mouse_id, sessions=output_sessions,
                         cache_dir=cache_dir)
 
-            if len(session_names) == 0:
+            if len(session_dates) == 0:
                 raise ValueError(f"Did not find {include_stage} stage sessions "
                     f"from {mouse_id}, class Mouse will be empty.")
 
@@ -277,9 +264,10 @@ class Mouse:
             )
 
             logging.info(
-            f"\n> Included {len(output_sessions)} {include_stage} stage"
+            f"\n> Included {len(output_sessions)} {stage_names} stage"
                 f" sessions between {time.strftime('%Y %B %d', date_start)} to"
                 f" {time.strftime('%Y %B %d', date_end)}.")
+
         else:
             raise ValueError(f"{mouse_id} not found, class Mouse will be empty.")
 
