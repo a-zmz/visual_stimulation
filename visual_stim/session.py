@@ -64,6 +64,11 @@ class Session(BaseMeta):
         )
 
 
+    def get_trials(self):
+        data, meta = self.concat_raw_data()
+        return data, meta
+
+
     def concat_raw_data(self):
         """
         Write getting trial data as a separate function to deal with .mat file
@@ -137,4 +142,12 @@ class Session(BaseMeta):
         meta_df = meta_df.infer_objects()
 
         return data, meta_df
+
+        # NOTE that the timestamp zeros at the beginning of each trial, and they
+        # are the START of the segment (i.e., if we have timestamps of 0.02,
+        # 1.05 for black and gray, black started at 0.02 and lasted for 1.03s)
+
+        # we could keep the same temporal sampling frequency as vr, i.e., 2000Hz
+
+        assert 0
 
