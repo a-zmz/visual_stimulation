@@ -15,11 +15,12 @@ class Session(BaseMeta):
     """
 
     def __init__(self, date=None, data_dir=None, meta_path=None, cache_dir=None):
-        super().__init__(meta_path, name=date)
+        self.mouse_id = meta_path.name.split("_")[-2]
+        self.name = f"{date}_az_{self.mouse_id}"
+        super().__init__(meta_path, name=self.name)
         self.cache_dir = cache_dir
         self.data_dir = data_dir
         self.meta_path = meta_path
-        self.mouse_id = meta_path.name.split("_")[-2]
 
 
     @classmethod
