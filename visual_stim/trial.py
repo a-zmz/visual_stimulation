@@ -90,8 +90,6 @@ class Trial():
         # use more clear column name
         data = data.rename(columns={"type": "status"})
 
-        data["trial_id"] = self.id
-
         # get trial length
         trial_length = params["End_time"] - params["Trigger_time"]
 
@@ -107,6 +105,9 @@ class Trial():
             end_event["angle"] = 0
 
         df = pd.concat([data, pd.DataFrame([end_event])], ignore_index=True)
+
+        # add trial id
+        df["trial_id"] = self.id
 
         if is_movie:
             self.stim_type = StimulusType.from_str("movie").name.lower()
