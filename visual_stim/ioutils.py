@@ -12,7 +12,7 @@ def get_exp(mouse_ids):
 
     from analysis.base import (data_dir, interim_dir, processed_dir,
                                session_date_fmt)
-    from analysis.project.food_restricted.fr_base import exclude_date
+    from analysis.project.food_restriction.fr_base import exclude_date
 
     exp = Experiment(
         mouse_ids=mouse_ids,
